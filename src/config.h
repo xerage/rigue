@@ -14,26 +14,10 @@
  *
  * Copyright (C) Gergely Szarka, 2014
  */
-#include "rigue.h"
+#ifndef CONFIG_H
 
-int main(int argc, const char *argv[])
-{
-    /* Open connection to the X server*/
-    if (!(display = XOpenDisplay(NULL)))
-        exit(1);
+#define CONFIG_H
 
-    /* Set up base info */
-    screen = DefaultScreen(display);
-    root = RootWindow(display, screen);
 
-    /* Registering for events */
 
-    /* Main loop
-     * TODO: change wired 1 to a bool running variable or something like that */
-    while (1)
-    {
-        XNextEvent(display, &event);
-    }
-
-    return 0;
-}
+#endif /* end of include guard: CONFIG_H */

@@ -18,13 +18,26 @@
 
 #define RIGUE_H
 
+/* Standard libs */
 #include <stdio.h>
 #include <stdlib.h>
 
+/* X11 libs */
 #include <X11/Xlib.h>
 
+/* Rigue libs */
+#include "action.h"
+#include "client.h"
+#include "event.h"
+#include "wm.h"
+
+/* Configs */
+#include "config.h"
+
+/* Enums */
 enum { UP, RIGHT, DOWN, LEFT };
 
+/* Typedefs */
 typedef struct Geom Geom;
 struct Geom {
     int x, y, w, h;
@@ -33,17 +46,16 @@ struct Geom {
 typedef struct Client Client;
 struct Client {
     Window win;
-    Geom geom;
+    Geom geom, save;
     Client * next;
 };
 
+/* Variables */
 Display * display;
 Window root;
 int screen;
-
 XEvent event;
 XButtonEvent move_start;
-
 XWindowAttributes attr;
 
 #endif /* end of include guard: RIGUE_H */
