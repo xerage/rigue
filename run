@@ -1,0 +1,5 @@
+#!/bin/bash
+
+set -e
+
+xinit ./xinitrc -- /usr/bin/Xephyr :1 -ac -screen 800x600 -host-cursor
