@@ -15,3 +15,108 @@
  * Copyright (C) Gergely Szarka, 2014
  */
 #include "rigue.h"
+
+#define HANDLE(X) case X: X##Handler(); break
+
+void EventHandler()
+{
+    switch (event.type) {
+        HANDLE(KeyPress);
+        HANDLE(ButtonPress);
+        HANDLE(ButtonRelease);
+        HANDLE(MotionNotify);
+        HANDLE(MapRequest);
+        HANDLE(UnmapNotify);
+    }
+}
+
+/* Handler functions */
+void KeyPressHandler()
+{
+    int i;
+    KeySym keysym;
+
+    keysym = XkbKeycodeToKeysym(display, event.xkey.keycode, 0, 0);
+
+    for (i = 0; i < (sizeof(keys) / sizeof(*keys)); ++i)
+    {
+        if (keysym == keys[i].keysym && keys[i].mod == event.xkey.state)
+            if (keys[i].function)
+                keys[i].function();
+    }
+
+    wm_debug("*** Key pressed");
+}
+
+void ButtonPressHandler()
+{
+    if (event.xbutton.subwindow == None)
+        return;
+
+    XRaiseWindow(display, event.xbutton.subwindow);
+    XSetInputFocus(display, event.xbutton.subwindow, RevertToParent, CurrentTime);
+    current = client_find(event.xbutton.subwindow);
+
+    XGrabPointer(display, event.xbutton.subwindow, True, PointerMotionMask|ButtonReleaseMask,
+            GrabModeAsync, GrabModeAsync, None, None, CurrentTime);
+    XGetWindowAttributes(display, event.xbutton.subwindow, &attr);
+    move_start = event.xbutton;
+
+    printf("*** Button pressed\n");
+}
+
+void ButtonReleaseHandler()
+{
+    XUngrabPointer(display, CurrentTime);
+
+    XGetWindowAttributes(display, event.xbutton.subwindow, &attr);
+    current->geom.x = attr.x; current->geom.y = attr.y;
+    current->geom.w = attr.width; current->geom.h = attr.height;
+}
+
+void MotionNotifyHandler()
+{
+    int xdiff, ydiff;
+    Client* c;
+
+    if ((c = client_find(event.xmotion.window)))
+        current = c;
+
+    while (XCheckTypedEvent(display, MotionNotify, &event));
+
+    xdiff = event.xmotion.x_root - move_start.x_root;
+    ydiff = event.xmotion.y_root - move_start.y_root;
+
+    XMoveResizeWindow(display, event.xmotion.window,
+            attr.x + (move_start.button == 1 ? xdiff : 0),
+            attr.y + (move_start.button == 1 ? ydiff : 0),
+            MAX(1, attr.width + (move_start.button == 3 ? xdiff : 0)),
+            MAX(1, attr.height + (move_start.button == 3 ? ydiff : 0)));
+}
+
+void MapRequestHandler()
+{
+    Client* c;
+
+    c = client_new(event.xmaprequest.window);
+    client_map(c);
+    current = c;
+
+    wm_debug("Map requested");
+}
+
+void UnmapNotifyHandler()
+{
+    Client* c;
+
+    if ((c = client_find(event.xunmap.window)))
+        client_remove(c);
+}
+
+void DestroyNotifyHandler()
+{
+    Client* c;
+
+    if ((c = client_find(event.xdestroywindow.window)))
+        client_remove(c);
+}

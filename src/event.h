@@ -18,6 +18,13 @@
 
 #define EVENT_H
 
+void EventHandler();
 
+void KeyPressHandler();
+void ButtonPressHandler();
+void ButtonReleaseHandler();
+void MotionNotifyHandler();
+void MapRequestHandler();
+void UnmapNotifyHandler();
 
 #endif /* end of include guard: EVENT_H */

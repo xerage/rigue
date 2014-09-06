@@ -20,20 +20,20 @@ int main(int argc, const char *argv[])
 {
     /* Open connection to the X server*/
     if (!(display = XOpenDisplay(NULL)))
-        exit(1);
+        wm_panic("Can't open display.");
 
-    /* Set up base info */
-    screen = DefaultScreen(display);
-    root = RootWindow(display, screen);
-
-    /* Registering for events */
+    /* Set up */
+    wm_init();
 
     /* Main loop
      * TODO: change wired 1 to a bool running variable or something like that */
-    while (1)
+    while (wm_running)
     {
         XNextEvent(display, &event);
+        EventHandler();
     }
+
+    XCloseDisplay(display);
 
     return 0;
 }

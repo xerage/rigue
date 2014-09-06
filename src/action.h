@@ -18,6 +18,7 @@
 
 #define ACTION_H
 
-
+void kill_client();
+void snap_right();
 
 #endif /* end of include guard: ACTION_H */

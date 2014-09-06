@@ -14,26 +14,21 @@
  *
  * Copyright (C) Gergely Szarka, 2014
  */
-#include "rigue.h"
+#ifndef KEYS_H
 
-void kill_client()
-{
-    wm_debug("Killing client");
-    if ((head == NULL) || (current == NULL)) return;
-    client_remove(current);
-}
+#define KEYS_H
 
-void move_client(Client* c, int x, int y)
-{
-    c->geom.x = x;
-    c->geom.y = y;
-    XMoveWindow(display, c->win, x, y);
-}
+#define _ALT        Mod1Mask
+#define _CTRL       ControlMask
+#define _SHIFT      ShiftMask
+#define _SUPER      Mod4Mask
 
-void snap_right()
-{
-    int x, y;
-    x = current->geom.x + 10;
-    y = current->geom.y;
-    move_client(current, x, y);
-}
+static Key keys[] = {
+    {_CTRL|_ALT, XK_Delete, wm_quit},
+    {_SUPER, XK_c, kill_client},
+    {_SUPER, XK_Right, snap_right}
+};
+
+void keys_init();
+
+#endif /* end of include guard: KEYS_H */

@@ -18,6 +18,11 @@
 
 #define CLIENT_H
 
+Client * client_new(Window);
+void client_map(Client*);
+void client_decorate(Client*);
+void client_remove(Client*);
+Client* client_find(Window);
 
 
 #endif /* end of include guard: CLIENT_H */

@@ -18,18 +18,19 @@
 
 #define RIGUE_H
 
+/* Macros */
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+
 /* Standard libs */
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 /* X11 libs */
 #include <X11/Xlib.h>
-
-/* Rigue libs */
-#include "action.h"
-#include "client.h"
-#include "event.h"
-#include "wm.h"
+#include <X11/XKBlib.h>
+#include <X11/keysym.h>
+#include <X11/Xlocale.h>
 
 /* Configs */
 #include "config.h"
@@ -38,6 +39,13 @@
 enum { UP, RIGHT, DOWN, LEFT };
 
 /* Typedefs */
+typedef struct Key Key;
+struct Key{
+    unsigned int mod;
+    KeySym keysym;
+    void (*function)();
+};
+
 typedef struct Geom Geom;
 struct Geom {
     int x, y, w, h;
@@ -50,6 +58,13 @@ struct Client {
     Client * next;
 };
 
+/* Rigue libs */
+#include "action.h"
+#include "client.h"
+#include "event.h"
+#include "wm.h"
+#include "keys.h"
+
 /* Variables */
 Display * display;
 Window root;
@@ -57,5 +72,13 @@ int screen;
 XEvent event;
 XButtonEvent move_start;
 XWindowAttributes attr;
+
+unsigned int color_focus, color_unfocus;
+
+Client *head, *current;
+
+extern Key keys[];
+
+int wm_running;
 
 #endif /* end of include guard: RIGUE_H */

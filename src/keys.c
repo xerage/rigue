@@ -16,24 +16,21 @@
  */
 #include "rigue.h"
 
-void kill_client()
+void keys_init()
 {
-    wm_debug("Killing client");
-    if ((head == NULL) || (current == NULL)) return;
-    client_remove(current);
-}
+    int i;
+    KeyCode code;
 
-void move_client(Client* c, int x, int y)
-{
-    c->geom.x = x;
-    c->geom.y = y;
-    XMoveWindow(display, c->win, x, y);
-}
+    XUngrabKey(display, AnyKey, AnyModifier, root);
 
-void snap_right()
-{
-    int x, y;
-    x = current->geom.x + 10;
-    y = current->geom.y;
-    move_client(current, x, y);
+    for (i = 0; i < (sizeof(keys) / sizeof(*keys)); ++i)
+    {
+        code = XKeysymToKeycode(display, keys[i].keysym);
+        XGrabKey(display, code, keys[i].mod, root, True, GrabModeAsync, GrabModeAsync);
+    }
+
+    for (i = 0; i < 4; i += 2)
+    {
+        XGrabButton(display, i, _ALT, root, True, ButtonPressMask, GrabModeAsync, GrabModeAsync, None, None);
+    }
 }

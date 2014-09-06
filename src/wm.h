@@ -18,6 +18,9 @@
 
 #define WM_H
 
-
+void wm_debug(const char*);
+void wm_panic(const char*);
+void wm_init();
+void wm_quit();
 
 #endif /* end of include guard: WM_H */
