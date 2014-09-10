@@ -67,10 +67,8 @@ int ewmh_send_message(Client* c, int type, int msg) {
 	ev.type = ClientMessage;
 	ev.xclient.window = c->win;
 	ev.xclient.message_type = atom[type];
-	/*ev.xclient.message_type = XInternAtom(dpy, "WM_PROTOCOLS", True);*/
 	ev.xclient.format = 32;
 	ev.xclient.data.l[0] = atom[msg];
-	/*ev.xclient.data.l[0] = XInternAtom(dpy, "WM_DELETE_WINDOW", True);*/
 	ev.xclient.data.l[1] = CurrentTime;
 	XSendEvent(display, c->win, False, NoEventMask, &ev);
 	return 0;
