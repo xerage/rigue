@@ -44,8 +44,6 @@ void KeyPressHandler()
             if (keys[i].function)
                 keys[i].function();
     }
-
-    wm_debug("*** Key pressed");
 }
 
 void ButtonPressHandler()
@@ -53,25 +51,26 @@ void ButtonPressHandler()
     if (event.xbutton.subwindow == None)
         return;
 
-    XRaiseWindow(display, event.xbutton.subwindow);
     XSetInputFocus(display, event.xbutton.subwindow, RevertToParent, CurrentTime);
     current = client_find(event.xbutton.subwindow);
+    client_update_current(current);
 
     XGrabPointer(display, event.xbutton.subwindow, True, PointerMotionMask|ButtonReleaseMask,
             GrabModeAsync, GrabModeAsync, None, None, CurrentTime);
     XGetWindowAttributes(display, event.xbutton.subwindow, &attr);
     move_start = event.xbutton;
-
-    printf("*** Button pressed\n");
 }
 
 void ButtonReleaseHandler()
 {
     XUngrabPointer(display, CurrentTime);
 
-    XGetWindowAttributes(display, event.xbutton.subwindow, &attr);
-    current->geom.x = attr.x; current->geom.y = attr.y;
-    current->geom.w = attr.width; current->geom.h = attr.height;
+    if (event.xbutton.window == current->win)
+    {
+        XGetWindowAttributes(display, current->win, &attr);
+        current->geom.x = attr.x; current->geom.y = attr.y;
+        current->geom.w = attr.width; current->geom.h = attr.height;
+    }
 }
 
 void MotionNotifyHandler()
@@ -100,22 +99,25 @@ void MapRequestHandler()
 
     c = client_new(event.xmaprequest.window);
     client_map(c);
-    current = c;
-
-    wm_debug("Map requested");
 }
 
 void UnmapNotifyHandler()
 {
     Client* c;
 
+    wm_debug("Unmap event occured.");
+
     if ((c = client_find(event.xunmap.window)))
+    {
         client_remove(c);
+    }
 }
 
 void DestroyNotifyHandler()
 {
     Client* c;
+
+    wm_debug("Destroy event occured.");
 
     if ((c = client_find(event.xdestroywindow.window)))
         client_remove(c);

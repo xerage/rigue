@@ -27,6 +27,10 @@ void wm_panic(const char * err)
     exit(1);
 }
 
+void wm_signal_handler(int signal)
+{
+}
+
 unsigned long wm_get_color(const char * color)
 {
     XColor c;
@@ -41,11 +45,24 @@ unsigned long wm_get_color(const char * color)
 void wm_init()
 {
     char * loc;
+    Window dw1, dw2;
+    Window* wins;
+    Window supporting;
+    int i, nwins;
+    unsigned long pid;
 
+    pid = getpid();
+
+    /* Set globals */
     screen = DefaultScreen(display);
     root = RootWindow(display, screen);
 
-    XSelectInput(display, root, SubstructureRedirectMask|PointerMotionMask);
+    display_w = DisplayWidth(display, screen);
+    display_h = DisplayHeight(display, screen);
+
+    XDefineCursor(display, root, XCreateFontCursor(display, 68));
+
+    XSelectInput(display, root, SubstructureRedirectMask|SubstructureNotifyMask|PointerMotionMask);
 
     loc = setlocale(LC_ALL, "");
     if (!loc || !strcmp(loc, "C") || !strcmp(loc, "POSIX") || !XSupportsLocale())
@@ -57,16 +74,76 @@ void wm_init()
 
     keys_init();
 
+    /* EWMH */
+    ewmh_init();
+    supporting = XCreateSimpleWindow(display, root, 0, 0, 1, 1, 0, 0, 0);
+    XChangeProperty(display, root, atom[NET_SUPPORTED], XA_ATOM, 32, PropModeReplace, (unsigned char*)atom, ATOM_LAST);
+    XChangeProperty(display, root, atom[NET_SUPPORTING_WM_CHECK], XA_WINDOW, 32, PropModeReplace, (unsigned char*)&supporting, 1);
+    XChangeProperty(display, supporting, atom[NET_SUPPORTING_WM_CHECK], XA_WINDOW, 32, PropModeReplace, (unsigned char*)&supporting, 1);
+    XChangeProperty(display, supporting, atom[NET_WM_NAME], XA_STRING, 8, PropModeReplace, (const unsigned char*)"rigue", 6);
+    XChangeProperty(display, supporting, atom[NET_WM_PID], XA_CARDINAL, 32, PropModeReplace, (unsigned char*)&pid, 1);
+
+    /* Manage existing windows */
+    XQueryTree(display, root, &dw1, &dw2, &wins, &nwins);
+    for (i = 0; i < nwins; i++)
+    {
+        XGetWindowAttributes(display, wins[i], &attr);
+        if (attr.override_redirect || (wins[i] == root)) continue;
+        if (client_find(wins[i])) continue;
+        client_new(wins[i]);
+    }
+
     wm_running = 1;
-    wm_debug("Rigue started");
+    wm_debug("Rigue started!");
 }
 
 void wm_quit()
 {
+    Client* c;
+    for (c = head; c; c = c->next)
+        kill_client(c);
     XClearWindow(display, root);
     XUngrabKey(display, AnyKey, AnyModifier, root);
+    XUngrabButton(display, AnyKey, AnyModifier, root);
+    XFlush(display);
     XSync(display, False);
     XSetInputFocus(display, root, RevertToPointerRoot, CurrentTime);
     wm_running = 0;
     wm_debug("Exiting rigue! Bye!");
+}
+
+int wm_recompile()
+{
+    int ret;
+
+    wm_debug("Recompiling rigue");
+
+    ret = system("make clean all");
+
+    if (ret != 0)
+    {
+        wm_debug("Recompile failed");
+        return False;
+    }
+    else
+    {
+        wm_debug("Recompile succeeded");
+        return True;
+    }
+}
+
+void wm_restart()
+{
+    pid_t pid;
+    int ret;
+
+    if (!(wm_recompile())) return;
+
+    wm_debug("Restarting rigue");
+
+    pid = fork();
+    if (pid > 0)
+        ret = execl("./rigue", "./rigue", NULL);
+    else
+        wm_quit();
 }

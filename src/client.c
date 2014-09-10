@@ -20,13 +20,18 @@ Client * client_new(Window win)
 {
     Client *c;
 
+    XGetWindowAttributes(display, win, &attr);
+
+    if (attr.override_redirect) return NULL;
+    if (c = client_find(win)) return NULL;
+
     c = malloc(sizeof *c);
     c->next = head;
     head = c;
 
     c->win = win;
 
-    XGetWindowAttributes(display, c->win, &attr);
+    c->name = ewmh_get_text(c, WM_NAME);
     c->geom.x = attr.x;
     c->geom.y = attr.y;
     c->geom.w = attr.width;
@@ -40,8 +45,6 @@ void client_remove(Client* c)
     Client* tmp;
 
     XGrabServer(display);
-    XUngrabButton(display, AnyButton, AnyModifier, c->win);
-    XUnmapWindow(display, c->win);
 
     if (head == c)
         head = c->next;
@@ -49,6 +52,8 @@ void client_remove(Client* c)
         for (tmp = head; tmp && tmp->next; tmp = tmp->next)
             if (tmp->next == c)
                 tmp->next = c->next;
+
+    client_update_current(client_next(c));
     free(c);
 
     XUngrabServer(display);
@@ -57,7 +62,10 @@ void client_remove(Client* c)
 void client_decorate(Client* c)
 {
     XSetWindowBorderWidth(display, c->win, BORDER_WIDTH);
-    XSetWindowBorder(display, c->win, color_focus);
+    if (c->focus)
+        XSetWindowBorder(display, c->win, color_focus);
+    else
+        XSetWindowBorder(display, c->win, color_unfocus);
 }
 
 void client_map(Client *c)
@@ -66,8 +74,38 @@ void client_map(Client *c)
 
     if (attr.override_redirect) return;
 
-    client_decorate(c);
+    client_update_current(c);
     XMapWindow(display, c->win);
+}
+
+void client_update_current(Client* c)
+{
+    Client* tmp;
+
+    if ((head == NULL) || (c == NULL)) return;
+
+    current = c;
+
+    for (tmp = head; tmp; tmp = tmp->next)
+    {
+        if (tmp == current)
+        {
+            tmp->focus = True;
+            ewmh_send_message(tmp, WM_PROTOCOLS, WM_TAKE_FOCUS);
+            XRaiseWindow(display, tmp->win);
+        }
+        else
+            tmp->focus = False;
+        client_decorate(tmp);
+    }
+}
+
+Client* client_next(Client* c)
+{
+    if (!(c->next))
+        return head;
+    else
+        return c->next;
 }
 
 Client* client_find(Window win)
@@ -77,6 +115,27 @@ Client* client_find(Window win)
         if (c->win == win)
             return c;
 
-    wm_debug("Client found");
     return NULL;
+}
+
+void client_print()
+{
+    Client* c;
+
+    if (head == NULL)
+    {
+        wm_debug("No head");
+        return;
+    }
+
+    printf("--- Clientlist ---\n");
+    for (c = head; c; c = c->next)
+    {
+        if (c == current)
+            printf("*");
+        if (c->focus)
+            printf("!");
+        printf("Managed window %s [%d] @ %d:%d\n", c->name, c->win, c->geom.x, c->geom.y);
+    }
+    printf("------------------\n");
 }

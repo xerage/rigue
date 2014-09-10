@@ -20,10 +20,13 @@
 
 /* Macros */
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
 
 /* Standard libs */
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
 #include <string.h>
 
 /* X11 libs */
@@ -31,12 +34,17 @@
 #include <X11/XKBlib.h>
 #include <X11/keysym.h>
 #include <X11/Xlocale.h>
+#include <X11/Xatom.h>
+#include <X11/Xutil.h>
 
 /* Configs */
 #include "config.h"
 
 /* Enums */
 enum { UP, RIGHT, DOWN, LEFT };
+
+enum {WM_NAME, WM_PROTOCOLS, WM_DELETE_WINDOW, WM_STATE, WM_TAKE_FOCUS,
+        NET_WM_NAME, NET_SUPPORTED, NET_SUPPORTING_WM_CHECK, NET_WM_PID, ATOM_LAST};
 
 /* Typedefs */
 typedef struct Key Key;
@@ -55,10 +63,18 @@ typedef struct Client Client;
 struct Client {
     Window win;
     Geom geom, save;
+    char* name;
+    Bool focus;
     Client * next;
 };
 
+typedef struct Desktop Desktop;
+struct Desktop {
+    int w, h;
+};
+
 /* Rigue libs */
+#include "ewmh.h"
 #include "action.h"
 #include "client.h"
 #include "event.h"
@@ -73,7 +89,10 @@ XEvent event;
 XButtonEvent move_start;
 XWindowAttributes attr;
 
+Atom atom[ATOM_LAST];
+
 unsigned int color_focus, color_unfocus;
+unsigned int display_w, display_h;
 
 Client *head, *current;
 

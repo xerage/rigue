@@ -25,8 +25,19 @@
 
 static Key keys[] = {
     {_CTRL|_ALT, XK_Delete, wm_quit},
+    {_CTRL|_ALT, XK_Return, wm_restart},
     {_SUPER, XK_c, kill_client},
-    {_SUPER, XK_Right, snap_right}
+    {_SUPER, XK_m, toggle_maximize},
+    {_SUPER, XK_f, toggle_fullscreen},
+    {_SUPER, XK_p, client_print},
+    {_SUPER|_SHIFT, XK_Up, snap_up},
+    {_SUPER|_SHIFT, XK_Right, snap_right},
+    {_SUPER|_SHIFT, XK_Down, snap_down},
+    {_SUPER|_SHIFT, XK_Left, snap_left},
+    {_SUPER|_CTRL, XK_Up, grow_up},
+    {_SUPER|_CTRL, XK_Right, grow_right},
+    {_SUPER|_CTRL, XK_Down, grow_down},
+    {_SUPER|_CTRL, XK_Left, grow_left}
 };
 
 void keys_init();

@@ -14,27 +14,14 @@
  *
  * Copyright (C) Gergely Szarka, 2014
  */
-#ifndef ACTION_H
+#ifndef EWMH_H
 
-#define ACTION_H
+#define EWMH_H
 
-/* Control WM */
-void kill_client();
+Atom ewmh_get_atom(Client*, int);
+char* ewmh_get_text(Client*, int);
+int ewmh_init();
+int ewmh_send_message(Client*, int, int);
+Atom ewmh_make_atom(const char*);
 
-/* Maximize / Fullscreen */
-void toggle_maximize();
-void toggle_fullscreen();
-
-/* Move clients */
-void snap_up();
-void snap_right();
-void snap_down();
-void snap_left();
-
-/* Grow clients */
-void grow_up();
-void grow_right();
-void grow_down();
-void grow_left();
-
-#endif /* end of include guard: ACTION_H */
+#endif /* end of include guard: EWMH_H */
