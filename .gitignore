@@ -2,6 +2,7 @@ rigue
 run
 xinitrc
 scripts/
+.docs/
 *.o
 *.swp
 *~
