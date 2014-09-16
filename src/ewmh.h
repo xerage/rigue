@@ -23,5 +23,6 @@ char* ewmh_get_text(Client*, int);
 int ewmh_init();
 int ewmh_send_message(Client*, int, int);
 Atom ewmh_make_atom(const char*);
+void ewmh_set_client_list();
 
 #endif /* end of include guard: EWMH_H */

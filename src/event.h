@@ -23,6 +23,8 @@ void EventHandler();
 void KeyPressHandler();
 void ButtonPressHandler();
 void ButtonReleaseHandler();
+void ClientMessageHandler();
+void ConfigureRequestHandler();
 void MotionNotifyHandler();
 void MapRequestHandler();
 void UnmapNotifyHandler();

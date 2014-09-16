@@ -20,7 +20,8 @@
 
 /* Theme */
 #define BORDER_WIDTH        2
-#define FOCUS               "#cdee69"
+/*#define FOCUS               "#cdee69"*/
+#define FOCUS               "#22ff22"
 #define UNFOCUS             "#8eb33b"
 
 #endif /* end of include guard: CONFIG_H */

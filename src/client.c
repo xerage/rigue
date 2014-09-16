@@ -19,6 +19,8 @@
 Client * client_new(Window win)
 {
     Client *c;
+    long supplied;
+    Atom win_type;
 
     XGetWindowAttributes(display, win, &attr);
 
@@ -33,9 +35,12 @@ Client * client_new(Window win)
 
     c->name = ewmh_get_text(c, WM_NAME);
     c->geom.x = attr.x;
-    c->geom.y = attr.y;
+    c->geom.y = 16;
     c->geom.w = attr.width;
     c->geom.h = attr.height;
+
+    XGetWMNormalHints(display, c->win, &c->size, &supplied);
+    XGetTransientForHint(display, c->win, &c->trans);
 
     return c;
 }
@@ -92,6 +97,8 @@ void client_update_current(Client* c)
         {
             tmp->focus = True;
             ewmh_send_message(tmp, WM_PROTOCOLS, WM_TAKE_FOCUS);
+            ewmh_send_message(tmp, WM_PROTOCOLS, NET_ACTIVE_WINDOW);
+            XChangeProperty(display, root, atom[NET_ACTIVE_WINDOW], XA_WINDOW, 32, PropModeReplace, (unsigned char*)&tmp->win, 1);
             XRaiseWindow(display, tmp->win);
         }
         else

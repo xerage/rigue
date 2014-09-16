@@ -47,7 +47,6 @@ void wm_init()
     char * loc;
     Window dw1, dw2;
     Window* wins;
-    Window supporting;
     int i, nwins;
     unsigned long pid;
 
@@ -76,12 +75,7 @@ void wm_init()
 
     /* EWMH */
     ewmh_init();
-    supporting = XCreateSimpleWindow(display, root, 0, 0, 1, 1, 0, 0, 0);
-    XChangeProperty(display, root, atom[NET_SUPPORTED], XA_ATOM, 32, PropModeReplace, (unsigned char*)atom, ATOM_LAST);
-    XChangeProperty(display, root, atom[NET_SUPPORTING_WM_CHECK], XA_WINDOW, 32, PropModeReplace, (unsigned char*)&supporting, 1);
-    XChangeProperty(display, supporting, atom[NET_SUPPORTING_WM_CHECK], XA_WINDOW, 32, PropModeReplace, (unsigned char*)&supporting, 1);
-    XChangeProperty(display, supporting, atom[NET_WM_NAME], XA_STRING, 8, PropModeReplace, (const unsigned char*)"rigue", 6);
-    XChangeProperty(display, supporting, atom[NET_WM_PID], XA_CARDINAL, 32, PropModeReplace, (unsigned char*)&pid, 1);
+    XChangeProperty(display, supportwin, atom[NET_WM_PID], XA_CARDINAL, 32, PropModeReplace, (unsigned char*)&pid, 1);
 
     /* Manage existing windows */
     XQueryTree(display, root, &dw1, &dw2, &wins, &nwins);
@@ -92,6 +86,8 @@ void wm_init()
         if (client_find(wins[i])) continue;
         client_new(wins[i]);
     }
+
+    ewmh_set_client_list();
 
     wm_running = 1;
     wm_debug("Rigue started!");

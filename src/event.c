@@ -27,6 +27,8 @@ void EventHandler()
         HANDLE(MotionNotify);
         HANDLE(MapRequest);
         HANDLE(UnmapNotify);
+        HANDLE(ConfigureRequest);
+        HANDLE(ClientMessage);
     }
 }
 
@@ -99,6 +101,7 @@ void MapRequestHandler()
 
     c = client_new(event.xmaprequest.window);
     client_map(c);
+    ewmh_set_client_list();
 }
 
 void UnmapNotifyHandler()
@@ -111,6 +114,7 @@ void UnmapNotifyHandler()
     {
         client_remove(c);
     }
+    ewmh_set_client_list();
 }
 
 void DestroyNotifyHandler()
@@ -121,4 +125,33 @@ void DestroyNotifyHandler()
 
     if ((c = client_find(event.xdestroywindow.window)))
         client_remove(c);
+}
+
+void ConfigureRequestHandler()
+{
+    XWindowChanges wc;
+
+    wc.x = event.xconfigurerequest.x;
+    wc.y = event.xconfigurerequest.y;
+    wc.width = event.xconfigurerequest.width;
+    wc.height = event.xconfigurerequest.height;
+    wc.border_width = 0;
+    wc.sibling = event.xconfigurerequest.above;
+    wc.stack_mode = event.xconfigurerequest.detail;
+    XConfigureWindow(display, event.xconfigurerequest.window, event.xconfigurerequest.value_mask, &wc);
+    XSync(display, False);
+}
+
+void ClientMessageHandler()
+{
+    Client* c;
+
+    printf("atom: %x\n", event.xclient.message_type);
+
+    c = client_find(event.xclient.window);
+
+    if (event.xclient.message_type == atom[NET_ACTIVE_WINDOW])
+        client_update_current(c);
+    if (event.xclient.message_type == atom[NET_CLOSE_WINDOW])
+        kill_client(c);
 }

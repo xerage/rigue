@@ -1,8 +1,8 @@
 rigue
-doc/*
+doc/
 run
 xinitrc
-scripts/*
+scripts/
 *.o
 *.swp
 *~

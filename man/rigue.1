@@ -2,14 +2,26 @@
 .SH NAME
 rigue - simple, lightweight window manager
 .SH SYNOPSIS
-rigue
+rigue ['OPTION' ...]
 .SH DESCRIPTION
 .B rigue 
 is a simple, lightweight window manager that adheres
-to the unix philosophy of do one thing and do that well and
-tries to stay out of your way
+to the unix philosophy of 'do one thing and do that well' and
+tries to stay out of your way. The idea behind rigue is a
+manual tiling WM that provides a simple and easy way to create
+tiling layouts on-the-fly, with keybindings to move and
+resize your windows, snap windows to the edge of other
+windows to use as much screen space as you need.
 .PP
-rigue is still in Beta testing mode.
+The command starts rigue on 'DISPLAY'.
+.PP
+OPTION can be:
+    -c, --config 'PATH'::
+        use 'PATH' as config file instead of the one in '$XDG_CONFIG_HOME'
+    -v, --version::
+        print version and exit
+    --verbose::
+        print verbose informationto stderr
 .PP
 You can find more information at
 .B http://github.org/xerage/rigue

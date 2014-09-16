@@ -43,8 +43,23 @@
 /* Enums */
 enum { UP, RIGHT, DOWN, LEFT };
 
-enum {WM_NAME, WM_PROTOCOLS, WM_DELETE_WINDOW, WM_STATE, WM_TAKE_FOCUS,
-        NET_WM_NAME, NET_SUPPORTED, NET_SUPPORTING_WM_CHECK, NET_WM_PID, ATOM_LAST};
+enum {
+    /* WM Atoms */
+    WM_NAME, WM_PROTOCOLS, WM_DELETE_WINDOW, WM_STATE, WM_TAKE_FOCUS,
+    /* _NET Atoms */
+    NET_SUPPORTED, NET_CLIENT_LIST, NET_CLIENT_LIST_STACKING,
+    NET_ACTIVE_WINDOW, NET_WM_NAME, NET_SUPPORTING_WM_CHECK,
+    NET_WM_WINDOW_TYPE, NET_WM_STATE, NET_MOVERESIZE_WINDOW,
+    NET_WM_MOVERESIZE, NET_CLOSE_WINDOW, NET_WM_PID, NET_WORKAREA,
+    /* Desktop */
+    NET_NUMBER_OF_DESKTOPS, NET_DESKTOP_GEOMETRY, NET_CURRENT_DESKTOP, NET_DESKTOP_NAMES,
+    NET_WM_DESKTOP, NET_DESKTOP_VIEWPORT,
+    /* Window states */
+    NET_WM_STATE_FULLSCREEN, NET_WM_STATE_DEMANDS_ATTENTION,
+    /* Window types */
+    NET_WM_WINDOW_TYPE_DESKTOP, NET_WM_WINDOW_TYPE_DOCK, NET_WM_WINDOW_TYPE_TOOLBAR,
+    /* Last item */
+    ATOM_LAST};
 
 /* Typedefs */
 typedef struct Key Key;
@@ -61,8 +76,9 @@ struct Geom {
 
 typedef struct Client Client;
 struct Client {
-    Window win;
+    Window win, trans;
     Geom geom, save;
+    XSizeHints size;
     char* name;
     Bool focus;
     Client * next;
@@ -70,7 +86,8 @@ struct Client {
 
 typedef struct Desktop Desktop;
 struct Desktop {
-    int w, h;
+    unsigned int n_wins;
+    Client *head, *current, *transient;
 };
 
 /* Rigue libs */
@@ -84,6 +101,7 @@ struct Desktop {
 /* Variables */
 Display * display;
 Window root;
+Window supportwin;
 int screen;
 XEvent event;
 XButtonEvent move_start;
