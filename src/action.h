@@ -18,23 +18,44 @@
 
 #define ACTION_H
 
-/* Control WM */
-void kill_client();
+/* WM controll */
+void restart_wm();
+void exit_wm();
+void recompile_wm();
+
+/* Window management */
+void close();
+void iconify();
+void next_window();
+void toggle_always_on_top();
+void toggle_always_on_bottom();
+
+/* Desktop management */
+void next_desktop();
+void toggle_show_desktop();
 
 /* Maximize / Fullscreen */
-void toggle_maximize();
+void toggle_maximize_full();
+void toggle_maximize_horizontally();
+void toggle_maximize_vertically();
 void toggle_fullscreen();
 
+/* Change focus */
+void directional_focus_up();
+void directional_focus_right();
+void directional_focus_down();
+void directional_focus_left();
+
 /* Move clients */
-void snap_up();
-void snap_right();
-void snap_down();
-void snap_left();
+void move_to_edge_up();
+void move_to_edge_right();
+void move_to_edge_down();
+void move_to_edge_left();
 
 /* Grow clients */
-void grow_up();
-void grow_right();
-void grow_down();
-void grow_left();
+void grow_to_edge_up();
+void grow_to_edge_right();
+void grow_to_edge_down();
+void grow_to_edge_left();
 
 #endif /* end of include guard: ACTION_H */

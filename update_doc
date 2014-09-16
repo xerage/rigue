@@ -1,0 +1,3 @@
+#!/bin/bash
+
+naturaldocs -i src/ -o HTML docs/ -p .docs/

@@ -31,6 +31,21 @@ void wm_signal_handler(int signal)
 {
 }
 
+/*
+ * Function: wm_get_color
+ *
+ * Parses the given color variable and returns a
+ * pixel value usable by the X server.
+ *
+ * Parameters:
+ *  color - The hexadecimal color value
+ *
+ * Returns:
+ *  The pixel value of the color.
+ *
+ * See Also:
+ *  <wm_init>
+ */
 unsigned long wm_get_color(const char * color)
 {
     XColor c;
@@ -42,6 +57,14 @@ unsigned long wm_get_color(const char * color)
     return c.pixel;
 }
 
+/*
+ * Function: wm_init
+ *
+ * Sets up all the magic for the WM.
+ *
+ * See Also:
+ *  <wm_quit>
+ */
 void wm_init()
 {
     char * loc;

@@ -19,9 +19,8 @@
 #define CONFIG_H
 
 /* Theme */
-#define BORDER_WIDTH        2
-/*#define FOCUS               "#cdee69"*/
-#define FOCUS               "#22ff22"
-#define UNFOCUS             "#8eb33b"
+#define BORDER_WIDTH        2           /* Width of the window border in pixels */
+#define FOCUS               "#cdee69"   /* Color of the focused window's border */
+#define UNFOCUS             "#8eb33b"   /* Color of the unfocused windows' border */
 
 #endif /* end of include guard: CONFIG_H */
